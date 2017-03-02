@@ -1,5 +1,6 @@
 package com.leoybkim.justdoit;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -18,17 +19,19 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<String> items;
     ArrayAdapter<String> itemsAdapter;
-    ListView lvItem;
+    ListView listView;
+    private int request_code = 200;
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        lvItem = (ListView) findViewById(R.id.listView);
+        listView = (ListView) findViewById(R.id.listView);
         readItems();
         itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
-        lvItem.setAdapter(itemsAdapter);
+        listView.setAdapter(itemsAdapter);
 
         setUpListViewListener();
     }
@@ -41,9 +44,30 @@ public class MainActivity extends AppCompatActivity {
         writeItems();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK && requestCode == request_code){
+            String newText = data.getExtras().getString("newText");
+            items.set(request_code, newText);
+            itemsAdapter.notifyDataSetChanged();
+        }
+    }
+
     public void setUpListViewListener() {
-        lvItem.setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
+        // Edit on click
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
+                Intent i = new Intent(MainActivity.this, EditItemActivity.class);
+                i.putExtra("text", items.get(pos));
+                request_code = pos;
+                startActivityForResult(i, request_code);
+            }
+        });
+
+        // Delete on long click
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
                 items.remove(pos);
