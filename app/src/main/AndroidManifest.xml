@@ -16,6 +16,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.EditItemActivity"></activity>
+        <provider
+            android:name=".data.TaskProvider"
+            android:authorities="com.leoybkim.justdoit"
+            android:exported="false" />
     </application>
 
 </manifest>

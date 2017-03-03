@@ -1,35 +1,38 @@
 package com.leoybkim.justdoit.activities;
 
+import android.app.LoaderManager;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.leoybkim.justdoit.R;
 import com.leoybkim.justdoit.adapters.TaskAdapter;
-import com.leoybkim.justdoit.models.Task;
+import com.leoybkim.justdoit.adapters.TaskCursorAdapter;
+import com.leoybkim.justdoit.data.TaskContract;
 
-import org.apache.commons.io.FileUtils;
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-
-public class MainActivity extends AppCompatActivity {
-
-    ArrayList<String> fileLines;
-//    ArrayAdapter<String> itemsAdapter;
-    ArrayList<Task> tasks;
-    TaskAdapter mAdapter;
     ListView listView;
-    private final int REQUEST_CODE = 200;
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
+    EditText editText;
+    TaskAdapter mAdapter;
+    TaskCursorAdapter mCursorAdapter;
+    private Uri mCurrentTaskUri;
+    private static final int REQUEST_CODE = 200;
+    private static final int TASK_LOADER = 0;
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,35 +40,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         listView = (ListView) findViewById(R.id.listView);
-        readItems();
-        Log.d(LOG_TAG, tasks.toString());
-        mAdapter = new TaskAdapter(this, tasks);
-        listView.setAdapter(mAdapter);
+        mCursorAdapter = new TaskCursorAdapter(this, null);
+        listView.setAdapter(mCursorAdapter);
+
+        // Kick off the Loader
+        getLoaderManager().initLoader(REQUEST_CODE, null, this);
 
         setUpListViewListener();
-    }
-
-    public void onAddItem(View v) {
-        EditText editText = (EditText) findViewById(R.id.editText);
-        String taskDescription = editText.getText().toString();
-        mAdapter.add(new Task(taskDescription));
-        editText.setText("");
-        try {
-            writeItems();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK && requestCode == REQUEST_CODE){
-            String newText = data.getExtras().getString("newText");
-            int index = data.getExtras().getInt("index");
-            tasks.get(index).description = newText;
-            mAdapter.notifyDataSetChanged();
-        }
     }
 
     public void setUpListViewListener() {
@@ -74,9 +55,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
                 Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-                i.putExtra("text", tasks.get(pos).description);
-                i.putExtra("index", pos);
-                startActivityForResult(i, REQUEST_CODE);
+                Uri currentTaskUri = ContentUris.withAppendedId(TaskContract.TaskEntry.CONTENT_URI, id);
+                i.setData(currentTaskUri);
+                startActivity(i);
             }
         });
 
@@ -84,43 +65,96 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
-                tasks.remove(pos);
-                mAdapter.notifyDataSetChanged();
-                try {
-                    writeItems();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                showDeleteConfirmationDialog(id);
                 return true;
             }
         });
     }
 
-    private void readItems() {
-        File filesDir = getFilesDir();
-        File todoFile =  new File(filesDir, "todo.txt");
+    public void onAddItem(View v) {
+        editText = (EditText) findViewById(R.id.editText);
+        // Read from input fields
+        String taskString = editText.getText().toString().trim();
 
-        try {
-            tasks = new ArrayList<>();
-            fileLines = new ArrayList<String>(FileUtils.readLines(todoFile));
-            for (String lines: fileLines) {
-                tasks.add(new Task(lines));
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION, taskString);
+
+        if (mCurrentTaskUri == null) {
+            // Insert a new task into the provider, returning the content URI for the new task.
+            Uri newUri = getContentResolver().insert(TaskContract.TaskEntry.CONTENT_URI, values);
+            if (newUri == null) {
+                Toast.makeText(this, getString(R.string.insert_task_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.insert_task_successful),
+                        Toast.LENGTH_SHORT).show();
             }
-        } catch (IOException e) {
-            tasks = new ArrayList<Task>();
+        }
+
+        editText.setText("");
+    }
+
+    private void showDeleteConfirmationDialog(long id) {
+        final long taskId = id;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                deleteTask(taskId);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void deleteTask(long id) {
+        Uri currentTaskUri = ContentUris.withAppendedId(TaskContract.TaskEntry.CONTENT_URI, id);
+        if(currentTaskUri != null) {
+            int rowsDeleted = getContentResolver().delete(currentTaskUri, null, null);
+            if (rowsDeleted == 0) {
+                Toast.makeText(this, getString(R.string.delete_task_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.delete_task_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    private void writeItems() throws IOException {
-        File filesDir = getFilesDir();
-        File todoFile =  new File(filesDir, "todo.txt");
-        FileOutputStream fos = new FileOutputStream(todoFile);
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        // Database query
+        String[] projection = {
+                TaskContract.TaskEntry._ID,
+                TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION };
 
-        OutputStreamWriter osw = new OutputStreamWriter(fos);
+        // This Loader will execute the ContentProvider's query method on a background thread
+        return new CursorLoader(this,
+                TaskContract.TaskEntry.CONTENT_URI, // The content
+                projection,                       // The column to return for each row
+                null,                             // Selection criteria
+                null,                             // Selection criteria
+                null);
+    }
 
-        for (Task task: tasks) {
-            osw.write(task.description+"\n");
-        }
-        osw.close();
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        // Update with new cursor
+        mCursorAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // Callback is called when data needs to be deleted
+        mCursorAdapter.swapCursor(null);
     }
 }

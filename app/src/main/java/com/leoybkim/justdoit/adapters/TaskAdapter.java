@@ -1,7 +1,6 @@
 package com.leoybkim.justdoit.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +33,6 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         Task currentTask = getItem(position);
         TextView description = (TextView) listItemView.findViewById(R.id.description);
         description.setText(currentTask.description);
-        Log.d(LOG_TAG, currentTask.description);
         return listItemView;
     }
 }
