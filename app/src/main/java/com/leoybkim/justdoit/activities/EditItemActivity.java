@@ -11,6 +11,7 @@ import com.leoybkim.justdoit.R;
 public class EditItemActivity extends AppCompatActivity {
 
     EditText editText;
+    int index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +20,7 @@ public class EditItemActivity extends AppCompatActivity {
 
         // Read data from intent extras
         String text = getIntent().getExtras().getString("text");
+        index = getIntent().getExtras().getInt("index");
         editText = (EditText) findViewById(R.id.editText2);
         editText.setText(text);
     }
@@ -27,6 +29,7 @@ public class EditItemActivity extends AppCompatActivity {
         String newText = editText.getText().toString();
         Intent i = new Intent();
         i.putExtra("newText", newText);
+        i.putExtra("index", index);
         setResult(RESULT_OK, i);
         finish();
     }

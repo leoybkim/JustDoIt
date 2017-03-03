@@ -3,26 +3,32 @@ package com.leoybkim.justdoit.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.leoybkim.justdoit.R;
+import com.leoybkim.justdoit.adapters.TaskAdapter;
+import com.leoybkim.justdoit.models.Task;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    ArrayList<String> fileLines;
+//    ArrayAdapter<String> itemsAdapter;
+    ArrayList<Task> tasks;
+    TaskAdapter mAdapter;
     ListView listView;
-    private int request_code;
+    private final int REQUEST_CODE = 200;
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
@@ -32,27 +38,33 @@ public class MainActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.listView);
         readItems();
-        itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
-        listView.setAdapter(itemsAdapter);
+        Log.d(LOG_TAG, tasks.toString());
+        mAdapter = new TaskAdapter(this, tasks);
+        listView.setAdapter(mAdapter);
 
         setUpListViewListener();
     }
 
     public void onAddItem(View v) {
-        EditText etNewItem = (EditText) findViewById(R.id.editText);
-        String itemText = etNewItem.getText().toString();
-        itemsAdapter.add(itemText);
-        etNewItem.setText("");
-        writeItems();
+        EditText editText = (EditText) findViewById(R.id.editText);
+        String taskDescription = editText.getText().toString();
+        mAdapter.add(new Task(taskDescription));
+        editText.setText("");
+        try {
+            writeItems();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK && requestCode == request_code){
+        if(resultCode == RESULT_OK && requestCode == REQUEST_CODE){
             String newText = data.getExtras().getString("newText");
-            items.set(request_code, newText);
-            itemsAdapter.notifyDataSetChanged();
+            int index = data.getExtras().getInt("index");
+            tasks.get(index).description = newText;
+            mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -62,9 +74,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
                 Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-                i.putExtra("text", items.get(pos));
-                request_code = pos;
-                startActivityForResult(i, request_code);
+                i.putExtra("text", tasks.get(pos).description);
+                i.putExtra("index", pos);
+                startActivityForResult(i, REQUEST_CODE);
             }
         });
 
@@ -72,9 +84,13 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
-                items.remove(pos);
-                itemsAdapter.notifyDataSetChanged();
-                writeItems();
+                tasks.remove(pos);
+                mAdapter.notifyDataSetChanged();
+                try {
+                    writeItems();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return true;
             }
         });
@@ -83,20 +99,28 @@ public class MainActivity extends AppCompatActivity {
     private void readItems() {
         File filesDir = getFilesDir();
         File todoFile =  new File(filesDir, "todo.txt");
+
         try {
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
+            tasks = new ArrayList<>();
+            fileLines = new ArrayList<String>(FileUtils.readLines(todoFile));
+            for (String lines: fileLines) {
+                tasks.add(new Task(lines));
+            }
         } catch (IOException e) {
-            items = new ArrayList<String>();
+            tasks = new ArrayList<Task>();
         }
     }
 
-    private void writeItems() {
+    private void writeItems() throws IOException {
         File filesDir = getFilesDir();
         File todoFile =  new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
+        FileOutputStream fos = new FileOutputStream(todoFile);
+
+        OutputStreamWriter osw = new OutputStreamWriter(fos);
+
+        for (Task task: tasks) {
+            osw.write(task.description+"\n");
         }
+        osw.close();
     }
 }
