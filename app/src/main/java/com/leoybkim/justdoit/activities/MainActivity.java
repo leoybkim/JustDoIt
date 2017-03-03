@@ -1,4 +1,4 @@
-package com.leoybkim.justdoit;
+package com.leoybkim.justdoit.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+
+import com.leoybkim.justdoit.R;
 
 import org.apache.commons.io.FileUtils;
 

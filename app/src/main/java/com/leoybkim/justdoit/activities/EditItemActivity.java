@@ -1,10 +1,12 @@
-package com.leoybkim.justdoit;
+package com.leoybkim.justdoit.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
+
+import com.leoybkim.justdoit.R;
 
 public class EditItemActivity extends AppCompatActivity {
 
