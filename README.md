@@ -17,7 +17,7 @@ The following **required** functionality is completed:
 
 The following **optional** features are implemented:
 
-* [ ] Persist the todo items [into SQLite](http://guides.codepath.com/android/Persisting-Data-to-the-Device#sqlite) instead of a text file
+* [X] Persist the todo items [into SQLite](http://guides.codepath.com/android/Persisting-Data-to-the-Device#sqlite) instead of a text file
 * [ ] Improve style of the todo items in the list [using a custom adapter](http://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
 * [ ] Add support for completion due dates for todo items (and display within listview item)
 * [ ] Use a [DialogFragment](http://guides.codepath.com/android/Using-DialogFragment) instead of new Activity for editing items
@@ -26,19 +26,19 @@ The following **optional** features are implemented:
 
 The following **additional** features are implemented:
 
-* [ ] List anything else that you can get done to improve the app functionality!
+* [ ] Notification when deadline approches for to do item
 
 ## Video Walkthrough 
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://i.imgur.com/q9Gy7On.gifv' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+The biggest challenges I have faced while working on this project was restructuring the app from one stage to next stage. In my very first iteration, I had followed the tutorial made by CodePath to persist the todo items in a file. While updating my ArrayList<String> to `task` object types that I have created, I needed to change my way of reading and writing files. Also upon upgrading this to SQLite, I have also faced some issues with ContentProviders. But all of this was a great learning experience. I will continue to work on this over March 4th and 5th weekend. I realize that would be past the final submission deadline so please check my tags to see the version submitted before March 3. I'm hoping to finish the rest of the optional implementations and the additional features that I would like to implement. 
 
 ## License
 
