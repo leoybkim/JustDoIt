@@ -1,11 +1,14 @@
 # Pre-work - JustDoIt
-CodePath Android Bootcamp 2017 Submission
+CodePath Android Bootcamp 2017 Submission  
+<img src='http://i.imgur.com/4fiOA4o.gif' title='Just do it' width='' alt='Shia Labeouf gif'/>
+<img src='http://i.imgur.com/bTsDxkG.gif' title='Just do it' width='' alt='Shia Labeouf gif'/>
+<img src='http://i.imgur.com/gtndx7I.gif' title='Just do it' width='' alt='Shia Labeouf gif'/>
 
 **JustDoIt** is an android app that allows building a todo list and basic todo items management functionality including adding new items, editing and deleting an existing item.
 
 Submitted by: **Leo Kim**
 
-Time spent: **3** hours spent in total
+Time spent: **10** hours spent in total
 
 ## User Stories
 
@@ -18,7 +21,7 @@ The following **required** functionality is completed:
 The following **optional** features are implemented:
 
 * [X] Persist the todo items [into SQLite](http://guides.codepath.com/android/Persisting-Data-to-the-Device#sqlite) instead of a text file
-* [ ] Improve style of the todo items in the list [using a custom adapter](http://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
+* [X] Improve style of the todo items in the list [using a custom adapter](http://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
 * [ ] Add support for completion due dates for todo items (and display within listview item)
 * [ ] Use a [DialogFragment](http://guides.codepath.com/android/Using-DialogFragment) instead of new Activity for editing items
 * [ ] Add support for selecting the priority of each todo item (and display in listview item)
@@ -35,10 +38,6 @@ Here's a walkthrough of implemented user stories:
 <img src='http://i.imgur.com/q9Gy7On.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
-
-## Notes
-
-The biggest challenges I have faced while working on this project was restructuring the app from one stage to next stage. In my very first iteration, I had followed the tutorial made by CodePath to persist the todo items in a file. While updating my ArrayList<String> to `task` object types that I have created, I needed to change my way of reading and writing files. Also upon upgrading this to SQLite, I have also faced some issues with ContentProviders. But all of this was a great learning experience. I will continue to work on this over March 4th and 5th weekend. I realize that would be past the final submission deadline so please check my tags to see the version submitted before March 3. I'm hoping to finish the rest of the optional implementations and the additional features that I would like to implement. 
 
 ## License
 
