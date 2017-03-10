@@ -1,11 +1,11 @@
 package com.leoybkim.justdoit.activities;
 
+import android.support.v4.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -22,6 +22,7 @@ import com.leoybkim.justdoit.R;
 import com.leoybkim.justdoit.adapters.TaskAdapter;
 import com.leoybkim.justdoit.adapters.TaskCursorAdapter;
 import com.leoybkim.justdoit.data.TaskContract;
+import com.leoybkim.justdoit.fragments.EditTaskFragment;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -54,10 +55,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
-                Intent i = new Intent(MainActivity.this, EditItemActivity.class);
+                // EditItemActivity --> Fragments
+//                Intent i = new Intent(MainActivity.this, EditItemActivity.class);
+//                Uri currentTaskUri = ContentUris.withAppendedId(TaskContract.TaskEntry.CONTENT_URI, id);
+//                i.setData(currentTaskUri);
+//                startActivity(i);
+
+                // gets the current Task
                 Uri currentTaskUri = ContentUris.withAppendedId(TaskContract.TaskEntry.CONTENT_URI, id);
-                i.setData(currentTaskUri);
-                startActivity(i);
+
+                // initialize fragmentManager
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                EditTaskFragment editTaskFragment = EditTaskFragment.newInstance(currentTaskUri);
+                editTaskFragment.show(fragmentManager, "test fragment");
+
             }
         });
 
