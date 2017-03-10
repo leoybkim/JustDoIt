@@ -11,7 +11,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,8 +27,6 @@ import com.leoybkim.justdoit.activities.MainActivity;
 import com.leoybkim.justdoit.data.TaskContract;
 
 import java.util.Calendar;
-
-import static com.leoybkim.justdoit.data.TaskProvider.LOG_TAG;
 
 /**
  * Created by leo on 09/03/17.
@@ -42,6 +40,7 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
     private TextView mDueDate;
     private Uri mCurrentTaskUri;
     private RadioButton mRadioButton;
+    private RadioGroup mRadioGroup;
 
     // Identifier for the task data loader
     private static final int EXISTING_TASK_LOADER = 0;
@@ -57,6 +56,7 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
         mEditText = (EditText) mView.findViewById(R.id.editTask);
         mButton = (Button) mView.findViewById(R.id.update);
         mDueDate = (TextView) mView.findViewById(R.id.due_date);
+        mRadioGroup = (RadioGroup) mView.findViewById(R.id.priority_group);
 
         if (mCurrentTaskUri != null) {
             getLoaderManager().initLoader(EXISTING_TASK_LOADER, null, this);
@@ -72,6 +72,13 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
             @Override
             public void onClick(View v) {
                 showDatePicker();
+            }
+        });
+
+        mRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                mRadioButton = (RadioButton) mView.findViewById(i);
             }
         });
 
@@ -91,11 +98,13 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
         // Read from input fields
         String taskString = mEditText.getText().toString().trim();
         String dueDateString = mDueDate.getText().toString();
+        String priority = mRadioButton.getText().toString();
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
         values.put(TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION, taskString);
         values.put(TaskContract.TaskEntry.COLUMN_TASK_DUE_DATE, dueDateString);
+        values.put(TaskContract.TaskEntry.COLUMN_TASK_PRIORITY, priority);
 
         int rowsAffected = getActivity().getContentResolver().update(mCurrentTaskUri, values, null, null);
 
@@ -141,23 +150,43 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
         return new CursorLoader(getActivity(), mCurrentTaskUri, projection, null, null, null);
     }
 
+
+    // Fill the fragment from the database
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor.moveToFirst()) {
             int descriptionColumnIndex = cursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION);
             int dueDateColumnIndex = cursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_TASK_DUE_DATE);
+            int priorityColumnIndex = cursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_TASK_PRIORITY);
 
             String description = cursor.getString(descriptionColumnIndex);
             String dueDate = cursor.getString(dueDateColumnIndex);
-
-            Log.d(LOG_TAG, String.valueOf(dueDateColumnIndex));
-
+            String priority = cursor.getString(priorityColumnIndex);
 
             mEditText.setText(description);
             mEditText.setSelection(mEditText.length());   // move cursor to the end of the text
 
             if (dueDate != null) {
                 mDueDate.setText(dueDate);
+            }
+
+            if (priority != null) {
+                switch(priority.toUpperCase()) {
+                    case "HIGH":
+                        mRadioButton = (RadioButton) mView.findViewById(R.id.priority_high);
+                        mRadioButton.setChecked(true);
+                        break;
+                    case "MEDIUM":
+                        mRadioButton = (RadioButton) mView.findViewById(R.id.priority_medium);
+                        mRadioButton.setChecked(true);
+                        break;
+                    case "LOW":
+                        mRadioButton = (RadioButton) mView.findViewById(R.id.priority_low);
+                        mRadioButton.setChecked(true);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }

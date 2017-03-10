@@ -23,7 +23,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                 + TaskContract.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION + " TEXT, "
                 + TaskContract.TaskEntry.COLUMN_TASK_DUE_DATE + " TEXT, "
-                + TaskContract.TaskEntry.COLUMN_TASK_PRIORITY + " INTEGER);";
+                + TaskContract.TaskEntry.COLUMN_TASK_PRIORITY + " TEXT);";
         db.execSQL(SQL_CREATE_TASKS_TABLE);
     }
 
