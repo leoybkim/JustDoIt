@@ -8,7 +8,7 @@ CodePath Android Bootcamp 2017 Submission
 
 Submitted by: **Leo Kim**
 
-Time spent: **10** hours spent in total
+Time spent: **20** hours spent in total
 
 ## User Stories
 
@@ -22,20 +22,25 @@ The following **optional** features are implemented:
 
 * [X] Persist the todo items [into SQLite](http://guides.codepath.com/android/Persisting-Data-to-the-Device#sqlite) instead of a text file
 * [X] Improve style of the todo items in the list [using a custom adapter](http://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
-* [ ] Add support for completion due dates for todo items (and display within listview item)
-* [ ] Use a [DialogFragment](http://guides.codepath.com/android/Using-DialogFragment) instead of new Activity for editing items
-* [ ] Add support for selecting the priority of each todo item (and display in listview item)
+* [X] Add support for completion due dates for todo items (and display within listview item)
+* [X] Use a [DialogFragment](http://guides.codepath.com/android/Using-DialogFragment) instead of new Activity for editing items
+* [X] Add support for selecting the priority of each todo item (and display in listview item)
 * [ ] Tweak the style improving the UI / UX, play with colors, images or backgrounds
 
 The following **additional** features are implemented:
 
-* [ ] Notification when deadline approches for to do item
+* [ ] Notification options (with priority colors)
+* [ ] Spinner menu to remove all tasks 
+* [ ] Complete tasks and provide ways to view completed tasks
+* [ ] Swipe horizontally to delete individual tasks
+* [ ] Long press to reorder task
+
 
 ## Video Walkthrough 
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/q9Gy7On.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://i.imgur.com/Ynym8mC.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
