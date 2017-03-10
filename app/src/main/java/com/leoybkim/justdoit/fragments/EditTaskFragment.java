@@ -11,12 +11,14 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,16 +28,20 @@ import com.leoybkim.justdoit.data.TaskContract;
 
 import java.util.Calendar;
 
+import static com.leoybkim.justdoit.data.TaskProvider.LOG_TAG;
+
 /**
  * Created by leo on 09/03/17.
  */
 
 public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<Cursor> {
 
-    EditText editText;
-    Button button;
-    TextView dueDate;
-    Uri mCurrentTaskUri;
+    private View mView;
+    private EditText mEditText;
+    private Button mButton;
+    private TextView mDueDate;
+    private Uri mCurrentTaskUri;
+    private RadioButton mRadioButton;
 
     // Identifier for the task data loader
     private static final int EXISTING_TASK_LOADER = 0;
@@ -47,29 +53,29 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
         mCurrentTaskUri = getArguments().getParcelable("uri");
 
         // Inflate fragment
-        View view = inflater.inflate(R.layout.activity_edit_item, container, false);
-        editText = (EditText) view.findViewById(R.id.editTask);
-        button = (Button) view.findViewById(R.id.update);
-        dueDate = (TextView) view.findViewById(R.id.due_date);
+        mView = inflater.inflate(R.layout.activity_edit_item, container, false);
+        mEditText = (EditText) mView.findViewById(R.id.editTask);
+        mButton = (Button) mView.findViewById(R.id.update);
+        mDueDate = (TextView) mView.findViewById(R.id.due_date);
 
         if (mCurrentTaskUri != null) {
             getLoaderManager().initLoader(EXISTING_TASK_LOADER, null, this);
         }
 
-        button.setOnClickListener(new Button.OnClickListener() {
+        mButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 update(v);
             }
         });
 
-        dueDate.setOnClickListener(new View.OnClickListener() {
+        mDueDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDatePicker();
             }
         });
 
-        return view;
+        return mView;
     }
 
     // MainActivity passes new URI every click
@@ -83,11 +89,13 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
 
     public void update(View v) {
         // Read from input fields
-        String taskString = editText.getText().toString().trim();
+        String taskString = mEditText.getText().toString().trim();
+        String dueDateString = mDueDate.getText().toString();
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
         values.put(TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION, taskString);
+        values.put(TaskContract.TaskEntry.COLUMN_TASK_DUE_DATE, dueDateString);
 
         int rowsAffected = getActivity().getContentResolver().update(mCurrentTaskUri, values, null, null);
 
@@ -114,7 +122,7 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
             @Override
             public void onDateSet(DatePicker view, int y, int m, int d) {
                 String date = m + 1 + "/" + d + "/" + y;  // Month is indexed from 0
-                dueDate.setText(date);
+                mDueDate.setText(date);
             }
         }, year, month, day);
         datePicker.show();
@@ -125,7 +133,9 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
         // Database query
         String[] projection = {
                 TaskContract.TaskEntry._ID,
-                TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION };
+                TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION,
+                TaskContract.TaskEntry.COLUMN_TASK_DUE_DATE,
+                TaskContract.TaskEntry.COLUMN_TASK_PRIORITY };
 
         // This Loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(getActivity(), mCurrentTaskUri, projection, null, null, null);
@@ -135,9 +145,20 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor.moveToFirst()) {
             int descriptionColumnIndex = cursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION);
+            int dueDateColumnIndex = cursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_TASK_DUE_DATE);
+
             String description = cursor.getString(descriptionColumnIndex);
-            editText.setText(description);
-            editText.setSelection(editText.length());   // move cursor to the end of the text
+            String dueDate = cursor.getString(dueDateColumnIndex);
+
+            Log.d(LOG_TAG, String.valueOf(dueDateColumnIndex));
+
+
+            mEditText.setText(description);
+            mEditText.setSelection(mEditText.length());   // move cursor to the end of the text
+
+            if (dueDate != null) {
+                mDueDate.setText(dueDate);
+            }
         }
     }
 

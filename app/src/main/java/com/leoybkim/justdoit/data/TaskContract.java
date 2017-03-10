@@ -24,6 +24,9 @@ public final class TaskContract {
 
         public static final String TABLE_NAME ="tasks";
         public static final String _ID = BaseColumns._ID;
-        public static final String COLUMN_TASK_DESCRIPTION ="description";
+
+        public static final String COLUMN_TASK_DESCRIPTION = "description";
+        public static final String COLUMN_TASK_DUE_DATE = "dueDate";
+        public static final String COLUMN_TASK_PRIORITY = "priority";
     }
 }

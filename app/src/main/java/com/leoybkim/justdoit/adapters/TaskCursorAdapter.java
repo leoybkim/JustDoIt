@@ -56,10 +56,14 @@ public class TaskCursorAdapter extends CursorAdapter {
         TextView descriptionTextView = (TextView) view.findViewById(R.id.description);
 
         // Find columns of task attributes of interest
-        int taskColumnIndex = cursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION);
+        int descriptionColumnIndex = cursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_TASK_DESCRIPTION);
+        int dueDateColumnIndex = cursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_TASK_DUE_DATE);
+        int priorityColumnIndex = cursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_TASK_PRIORITY);
 
         // Read the task attribute from the cursor of the current task
-        String taskDescription = cursor.getString(taskColumnIndex);
+        String taskDescription = cursor.getString(descriptionColumnIndex);
+//        String taskDueDate = cursor.getString(dueDateColumnIndex);
+        // TODO: update textview radio button fro priority and duedate
 
         // Set TextView
         descriptionTextView.setText(taskDescription);
