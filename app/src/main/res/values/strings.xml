@@ -1,12 +1,24 @@
 <resources>
     <string name="app_name">JustDoIt</string>
+
+    <!-- Alert messages -->
     <string name="insert_task_failed">Failed to insert task</string>
     <string name="insert_task_successful">Successfully inserted task</string>
     <string name="update_task_failed">Failed to update task</string>
     <string name="update_task_successful">Successfully updated task</string>
     <string name="delete_dialog_msg">Delete this task?</string>
-    <string name="delete">Delete</string>
-    <string name="cancel">Cancel</string>
     <string name="delete_task_successful">Successfully deleted task</string>
     <string name="delete_task_failed">Failed to delete task</string>
+
+    <!-- Text Labels -->
+    <string name="edit_items">Edite item below:</string>
+
+    <!-- Button labels -->
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="add">Add</string>
+
+    <!-- EditText hint -->
+    <string name="enter_new_item">Enter new item</string>
 </resources>

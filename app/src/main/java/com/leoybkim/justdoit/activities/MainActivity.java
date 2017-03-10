@@ -1,15 +1,16 @@
 package com.leoybkim.justdoit.activities;
 
-import android.support.v4.app.FragmentManager;
-import android.app.LoaderManager;
+
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.CursorLoader;
 import android.content.DialogInterface;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -23,6 +24,8 @@ import com.leoybkim.justdoit.adapters.TaskAdapter;
 import com.leoybkim.justdoit.adapters.TaskCursorAdapter;
 import com.leoybkim.justdoit.data.TaskContract;
 import com.leoybkim.justdoit.fragments.EditTaskFragment;
+
+;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -45,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         listView.setAdapter(mCursorAdapter);
 
         // Kick off the Loader
-        getLoaderManager().initLoader(REQUEST_CODE, null, this);
+        getSupportLoaderManager().initLoader(REQUEST_CODE, null, this);
 
         setUpListViewListener();
     }
