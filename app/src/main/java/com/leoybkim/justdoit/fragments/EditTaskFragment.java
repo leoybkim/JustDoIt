@@ -98,7 +98,10 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
         // Read from input fields
         String taskString = mEditText.getText().toString().trim();
         String dueDateString = mDueDate.getText().toString();
-        String priority = mRadioButton.getText().toString();
+        String priority =  null;
+        if (mRadioButton != null) {
+            priority = mRadioButton.getText().toString();
+        }
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
