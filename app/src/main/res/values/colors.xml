@@ -3,4 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <!-- Priority radio buttons -->
+    <color name="high">#F44336</color>
+    <color name="medium">#FF9800</color>
+    <color name="low">#4CAF50</color>
 </resources>

@@ -1,6 +1,7 @@
 package com.leoybkim.justdoit.fragments;
 
 
+import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,12 +15,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.leoybkim.justdoit.R;
 import com.leoybkim.justdoit.activities.MainActivity;
 import com.leoybkim.justdoit.data.TaskContract;
+
+import java.util.Calendar;
 
 /**
  * Created by leo on 09/03/17.
@@ -29,6 +34,7 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
 
     EditText editText;
     Button button;
+    TextView dueDate;
     Uri mCurrentTaskUri;
 
     // Identifier for the task data loader
@@ -42,8 +48,9 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
 
         // Inflate fragment
         View view = inflater.inflate(R.layout.activity_edit_item, container, false);
-        editText = (EditText) view.findViewById(R.id.editText2);
-        button = (Button) view.findViewById(R.id.button2);
+        editText = (EditText) view.findViewById(R.id.editTask);
+        button = (Button) view.findViewById(R.id.update);
+        dueDate = (TextView) view.findViewById(R.id.due_date);
 
         if (mCurrentTaskUri != null) {
             getLoaderManager().initLoader(EXISTING_TASK_LOADER, null, this);
@@ -52,6 +59,13 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 update(v);
+            }
+        });
+
+        dueDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePicker();
             }
         });
 
@@ -88,6 +102,22 @@ public class EditTaskFragment extends DialogFragment implements LoaderCallbacks<
 
         Intent i = new Intent(getActivity(), MainActivity.class);
         startActivity(i);
+    }
+
+    public void showDatePicker() {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        
+        DatePickerDialog datePicker = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int y, int m, int d) {
+                String date = m + 1 + "/" + d + "/" + y;  // Month is indexed from 0
+                dueDate.setText(date);
+            }
+        }, year, month, day);
+        datePicker.show();
     }
 
     @Override
